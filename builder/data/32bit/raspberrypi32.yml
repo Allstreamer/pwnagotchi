@@ -72,7 +72,7 @@
         - apt-daily-upgrade.timer
         - apt-daily.service
         - apt-daily.timer
-        - ifup@wlan0.service
+        - ifup@wlan1.service
         - triggerhappy.service
         - wpa_supplicant.service
     packages:

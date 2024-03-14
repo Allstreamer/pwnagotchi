@@ -18,27 +18,27 @@ reload_brcm() {
     return 1
   fi
   sleep 2
-  iw dev wlan0 set power_save off
+  iw dev wlan1 set power_save off
   return 0
 }
 
 # starts mon0
 start_monitor_interface() {
   rfkill unblock all
-  ifconfig wlan0 up
-  iw dev wlan0 set power_save off
-  iw phy "$(iw phy | head -1 | cut -d" " -f2)" interface add wlan0mon type monitor
+  ifconfig wlan1 up
+  iw dev wlan1 set power_save off
+  iw phy "$(iw phy | head -1 | cut -d" " -f2)" interface add wlan1mon type monitor
   rfkill unblock all
-  ifconfig wlan0 down
-  ifconfig wlan0mon up
-  iw dev wlan0mon set power_save off
+  ifconfig wlan1 down
+  ifconfig wlan1mon up
+  iw dev wlan1mon set power_save off
 }
 
 # stops mon0
 stop_monitor_interface() {
-  ifconfig wlan0mon down && iw dev wlan0mon del
+  ifconfig wlan1mon down && iw dev wlan1mon del
   reload_brcm
-  ifconfig wlan0 up
+  ifconfig wlan1 up
 }
 
 # returns 0 if the specificed network interface is up
@@ -136,8 +136,8 @@ is_decrypted() {
         fi
       fi
 
-      if ! ip -4 addr show wlan0 | grep inet >/dev/null 2>&1; then
-        >/dev/null 2>&1 ip addr add 192.168.0.10/24 dev wlan0
+      if ! ip -4 addr show wlan1 | grep inet >/dev/null 2>&1; then
+        >/dev/null 2>&1 ip addr add 192.168.0.10/24 dev wlan1
       fi
 
       if ! pgrep -f decryption-webserver >/dev/null 2>&1; then
@@ -158,11 +158,11 @@ network={
     frequency=2437
 }
 EOF
-        >/dev/null 2>&1 wpa_supplicant -u -s -O -D nl80211 -i wlan0 -c /tmp/wpa_supplicant.conf &
+        >/dev/null 2>&1 wpa_supplicant -u -s -O -D nl80211 -i wlan1 -c /tmp/wpa_supplicant.conf &
       fi
 
       if ! pgrep dnsmasq >/dev/null 2>&1; then
-        >/dev/null 2>&1 dnsmasq -k -p 53 -h -O "6,192.168.0.10" -A "/#/192.168.0.10" -i wlan0 -K -F 192.168.0.50,192.168.0.60,255.255.255.0,24h &
+        >/dev/null 2>&1 dnsmasq -k -p 53 -h -O "6,192.168.0.10" -A "/#/192.168.0.10" -i wlan1 -K -F 192.168.0.50,192.168.0.60,255.255.255.0,24h &
       fi
 
       return 1
